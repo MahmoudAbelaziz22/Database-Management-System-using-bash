@@ -21,12 +21,12 @@ do
     print_colored "bwhite" "Please Select a Service: \c"
     read REPLY
     case $REPLY in
-    1 ) echo "Does not completed."
+    1 ) dive_into_database
     ;;
     2 ) close_program 
     ;;
     * ) print_colored "red" "Invalid choice, Please Select a Correct Service Number."
     ;;
     esac
-
+    clear
 done
