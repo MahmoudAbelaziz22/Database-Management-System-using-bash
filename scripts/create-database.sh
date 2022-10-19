@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # including helper function file.
-source ./helper-functions.sh
+source ./scripts/helper-functions.sh
 
 function create_database() {
  
@@ -37,7 +37,7 @@ function create_database() {
         then
             print_colored "green" "Database created sucessfully in $(pwd)"
             cd ../..
-			./tables.sh
+			./scripts/tables.sh
 		else
 			cd - > /dev/null 2>&1
             print_colored "red" "Can't access this location."

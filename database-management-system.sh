@@ -3,7 +3,7 @@
 # Databse management system project main file.
 
 # including helper function file.
-source ./helper-functions.sh
+source ./scripts/helper-functions.sh
 
 welcome_message
 
@@ -21,7 +21,8 @@ do
     print_colored "bwhite" "Please Select a Service: \c"
     read REPLY
     case $REPLY in
-    1 ) dive_into_database
+    1 ) source ./scripts/dive-into-database.sh
+    dive_into_database
     ;;
     2 ) close_program 
     ;;
