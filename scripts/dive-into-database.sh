@@ -26,7 +26,7 @@ function dive_into_database() {
     print_colored "green" "|------------------------------|"
     print_colored "green" "| 1. Create a new database.    |"
     print_colored "green" "| 2. Drop Database.            |"
-    print_colored "green" "| 3. Use existing Databas.     |"
+    print_colored "green" "| 3. Use existing Database.     |"
     print_colored "green" "| 4. Exit.                     |"
     print_colored "green" "+------------------------------+"
 
@@ -41,7 +41,8 @@ function dive_into_database() {
         drop_database
     exit
     ;;
-    3 ) echo "Use existing Databas." 
+    3 ) source ./scripts/use-existing-database.sh
+        use_existing_database
     exit
     ;;
     4 ) close_program 
