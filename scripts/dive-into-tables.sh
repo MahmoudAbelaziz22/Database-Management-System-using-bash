@@ -4,7 +4,6 @@ source ../../scripts/tables-functions.sh
 
 function dive_into_table(){
     clear
-
     print_colored "green" "+------------------------------+"
     print_colored "green" "|------------Table-------------|"
     print_colored "green" "|------------------------------|"
@@ -22,15 +21,15 @@ function dive_into_table(){
     read REPLY
     case $REPLY in
     1 ) create_table
-    dive_into_table
+    
     ;;
     2 ) update_table
     dive_into_table
     ;;
-    3 ) echo -e "delete table"
+    3 ) delete_table
     dive_into_table
     ;;
-    4 ) echo -e "insert into table"
+    4 ) insert_data
     dive_into_table 
     ;;
     5 ) echo -e "display table"

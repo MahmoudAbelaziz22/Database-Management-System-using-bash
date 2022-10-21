@@ -39,8 +39,7 @@ function create_database() {
             print_colored "green" "Database created sucessfully in $(pwd)"
 			echo press any key
 			read
-            cd ../..
-			source ./scripts/dive-into-tables.sh
+			source ../../scripts/dive-into-tables.sh
 			dive_into_table
 		else
 			cd - > /dev/null 2>&1

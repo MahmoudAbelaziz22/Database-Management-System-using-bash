@@ -1,5 +1,38 @@
 #! /bin/bash
 
+function check_dataType {
+	datatype=$(head -1 $2 | cut -d ':' -f$3 | awk -F "-" 'BEGIN { RS = ":" } {print $2}')
+	if [[ "$1" = '' ]]; then
+		echo 1
+	elif [[ "$1" = -?(0) ]]; then
+		echo 0 # error!
+	elif [[ "$1" = ?(-)+([0-9])?(.)*([0-9]) ]]; then
+		if [[ $datatype == integer ]]; then
+			# datatype integer and the input is integer
+			echo 1
+		else
+			# datatype string and input is integer
+			echo 1
+		fi
+	else
+		if [[ $datatype == integer ]]; then
+			# datatype integer and input is string
+			echo 0 # error!
+		else
+			# datatype string and input is string
+			echo 1
+		fi
+	fi
+}
+################################################################################
+function check_size {
+	datasize=$(head -1 $2 | cut -d ':' -f$3 | awk -F "-" 'BEGIN { RS = ":" } {print $3}')
+	if [[ "${#1}" -le $datasize ]]; then
+		echo 1
+	else
+		echo 0 # error
+	fi
+}
 function createMetaData {
 	# create the metadata
 		if [[ -f "$table_name" ]]
@@ -157,7 +190,6 @@ function createMetaData {
 						then
 							echo $'\n' >> "$table_name"
 							print_colored "green" "table created successfully."
-							
 							echo press any key
 							read
 					
@@ -208,7 +240,7 @@ function create_table {
         then
 			touch "$table_name"
 			createMetaData;
-            print_colored "green" "$table_name table created successfully."
+            dive_into_table
 		else
             print_colored "red" "Table name can't start with numbers or special characters."
 			create_table
@@ -363,4 +395,136 @@ function update_table {
 		echo press any key
 		read
 fi
+}
+
+function delete_table {
+	print_colored "bwhite" "Enter name of the table you want to delete:"
+	read table_name
+	# not exist
+	if ! [[ -f "$table_name" ]]
+	then
+		print_colored "red" "this table doesn't exist."
+        delete_table
+	# exists
+	else
+	    clear
+        print_colored "green" "+------------------------------+"
+        print_colored "green" "|-------Are you sure?----------|"
+        print_colored "green" "|------------------------------|"
+        print_colored "green" "| 1. Yes.                      |"
+        print_colored "green" "| 2. No.                       |"
+        print_colored "green" "+------------------------------+"
+        print_colored "bwhite" "Are you sure, you want to delete $table_name table:"
+		read REPLY
+        case $REPLY in
+        1 )
+		  rm "$table_name"
+		      print_colored "green" "table deleted."
+		      echo press any key
+		      read
+		;;
+		2 ) dive_into_table
+		;;
+		* ) print_colored "red" "Invalid entry."
+		;;
+		esac
+	fi
+}
+
+# insert data into table
+function insert_data {
+	# choose the table
+	print_colored "bwhite" "Enter name of the table:"
+	read table_name
+	# not exist
+	if ! [[ -f "$table_name" ]]
+	then
+		print_colored "red" "this table doesn't exist."
+        insert_data
+	else
+		## table exists
+		is_inserting_data=true
+		while $is_inserting_data
+		do
+			# enter pk
+			## => enter pk of type "id" of type integer and size 1
+			print_colored "bwhite" "Enter primary key \"$(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" '{print $1}')\" of type $(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" '{print $2}') and size $(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" '{print $3}')"
+			read REPLY
+			# match data & size
+			check_type=$(check_dataType "$REPLY" "$table_name" 1)
+			check_size=$(check_size "$REPLY" "$table_name" 1)
+			#=> print all records except first record
+			pk_used=$(cut -d ':' -f1 "$table_name" | awk '{if(NR != 1) print $0}' | grep -x -e "$REPLY")
+			# null entry
+			if [[ "$REPLY" == '' ]]
+			then
+				print_colored "red" "No entry."
+			# special characters
+			elif [[ $REPLY =~ [/.:\|\-] ]]
+			then
+				print_colored "red" "You can't enter these characters => . / : - | "
+			# not matching datatype 
+			elif [[ "$check_type" == 0 ]]
+			then 
+				print_colored "red" "Invalid entry."
+			# not matching size	
+			elif [[ "$check_size" == 0 ]]
+			then
+				print_colored "red" "Invalid entry size."
+			#! if primary key exists
+			elif ! [[ "$pk_used" == '' ]]
+			then
+				print_colored "red" "this primary key is already used."
+			# primary key is valid
+			else 
+				echo -n "$REPLY" >> "$table_name"
+				echo -n ':' >> "$table_name"
+				# to get number of columns in table
+				number_of_column=$(head -1 "$table_name" | awk -F: '{print NF}')
+				## to iterate over the columns after the primary key, in order to enter its data
+				for (( i = 2; i <= number_of_column; i++ ))
+				do
+				# enter other data
+				   inserting_other_data=true
+				   while $inserting_other_data
+				   do
+					 print_colored "bwhite" "Enter \"$(head -1 "$table_name" | cut -d ':' -f$i | awk -F "-" 'BEGIN { RS = ":" } {print $1}')\" of type $(head -1 "$table_name" | cut -d ':' -f$i | awk -F "-" 'BEGIN { RS = ":" } {print $2}') and size $(head -1 "$table_name" | cut -d ':' -f$i | awk -F "-" 'BEGIN { RS = ":" } {print $3}')"
+					 read REPLY
+					 # match data with its col datatype & size
+					 check_type=$(check_dataType "$REPLY" "$table_name" "$i")
+					 check_size=$(check_size "$REPLY" "$table_name" "$i")
+					 # not matching datatype
+					 if [[ "$check_type" == 0 ]]
+					 then
+						print_colored "red" "invalid entry."
+					 # not matching size
+					 elif [[ "$check_size" == 0 ]]
+					 then
+						print_colored "red" "Invalid entry size."
+					 # special characters
+					 elif [[ $REPLY =~ [/.:\|\-] ]]
+					 then
+						print_colored "red" "You can't enter these characters => . / : - |"
+					 # entry is valid
+					 else
+					    # if last column
+						if [[ i -eq $number_of_column ]]
+						then
+							echo "$REPLY" >> "$table_name"
+							inserting_other_data=false
+							is_inserting_data=false
+							print_colored "green" "Inserted successfully."
+						else
+						# next column 
+						   echo -n "$REPLY": >> "$table_name"
+						   inserting_other_data=false
+						fi
+					 fi
+				    done
+			    done
+		    fi
+	    done
+	echo press any key
+	read
+    fi
 }
