@@ -36,7 +36,8 @@ function use_existing_database() {
 	  else
 		cd "$database_name"
 		print_colored "green" "The database loaded successfully."
-        source ../../scripts/tables.sh
+        source ../../scripts/dive-into-tables.sh
+        dive_into_table
 
 	  fi
     fi

@@ -9,6 +9,7 @@ function create_database() {
 	print_colored "bwhite" "Enter the name of the database: "
 	read database_name
     cd ./Databases
+	
 	# if null entry
 	if [[ $database_name = "" ]]
     then
@@ -36,8 +37,11 @@ function create_database() {
 		if [[ "$newloc" = `pwd` ]]
         then
             print_colored "green" "Database created sucessfully in $(pwd)"
+			echo press any key
+			read
             cd ../..
-			./scripts/tables.sh
+			source ./scripts/dive-into-tables.sh
+			dive_into_table
 		else
 			cd - > /dev/null 2>&1
             print_colored "red" "Can't access this location."
