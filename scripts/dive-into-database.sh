@@ -1,6 +1,7 @@
 #! /bin/bash
 source ./helper-functions.sh
 
+# to clear screen.
 clear
 
 #######################################

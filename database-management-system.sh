@@ -1,12 +1,19 @@
 #! /bin/bash
 #
+# 
+#######################################
+#
 # Databse management system project main file.
+#
+#######################################
 
 # including helper function file.
 source ./scripts/helper-functions.sh
 
+#print welcome message into screen.
 welcome_message
 
+#project main loop.
 while true
 do 
     if [ ! -d "./Databases" ]; then

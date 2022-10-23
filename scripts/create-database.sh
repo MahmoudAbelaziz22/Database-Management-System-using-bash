@@ -3,13 +3,17 @@
 # including helper function file.
 source ./scripts/helper-functions.sh
 
+#######################################
+# create databses function.
+# Arguments:
+#   Non
+# Usage:      create_database
+#######################################
 function create_database() {
- 
 
 	print_colored "bwhite" "Enter the name of the database: "
 	read database_name
     cd ./Databases
-	
 	# if null entry
 	if [[ $database_name = "" ]]
     then

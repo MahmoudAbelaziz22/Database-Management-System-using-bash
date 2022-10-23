@@ -1,7 +1,14 @@
 #! /bin/bash
 
+#import tables-functions.sh file.
 source ../../scripts/tables-functions.sh
 
+#######################################
+# Dive into tables screen function.
+# Arguments:
+#   Non
+# Usage:      dive_into_table
+#######################################
 function dive_into_table(){
     clear
     print_colored "green" "+------------------------------+"
@@ -20,32 +27,31 @@ function dive_into_table(){
     print_colored "bwhite" "Please Select a Service: \c"
     read REPLY
     case $REPLY in
-    1 ) create_table
-    
-    ;;
-    2 ) update_table
-    dive_into_table
-    ;;
-    3 ) delete_table
-    dive_into_table
-    ;;
-    4 ) insert_data
-    dive_into_table 
-    ;;
-    5 ) display_table
-    dive_into_table 
-    ;;
-    6 ) display_row
-    dive_into_table 
-    ;;
-    7 ) delete_row
-    dive_into_table 
-    ;;
-    8 ) cd ../..
-    source ./scripts/dive-into-database.sh
-    dive_into_database 
-    ;;
-    * ) print_colored "red" "Invalid choice, Please Select a Correct Service Number."
-    ;;
+        1 ) create_table
+        ;;
+        2 ) update_table
+            dive_into_table
+            ;;
+        3 ) delete_table
+            dive_into_table
+            ;;
+        4 ) insert_data
+            dive_into_table 
+            ;;
+        5 ) display_table
+            dive_into_table 
+            ;;
+        6 ) display_row
+            dive_into_table 
+            ;;
+        7 ) delete_row
+            dive_into_table 
+            ;;
+        8 ) cd ../..
+            source ./scripts/dive-into-database.sh
+            dive_into_database 
+            ;;
+        * ) print_colored "red" "Invalid choice, Please Select a Correct Service Number."
+            ;;
     esac
 }
