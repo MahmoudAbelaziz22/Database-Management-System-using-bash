@@ -14,7 +14,7 @@ function dive_into_table(){
     print_colored "green" "| 5. Display table.            |"
     print_colored "green" "| 6. Display row.              |"
     print_colored "green" "| 7. Delete row.               |"
-    print_colored "green" "| 8. Exit.                     |"
+    print_colored "green" "| 8. Back.                     |"
     print_colored "green" "+------------------------------+"
 
     print_colored "bwhite" "Please Select a Service: \c"
@@ -32,17 +32,18 @@ function dive_into_table(){
     4 ) insert_data
     dive_into_table 
     ;;
-    5 ) echo -e "display table"
-    exit 
-    ;;
-    6 ) echo -e "display row"
+    5 ) display_table
     dive_into_table 
     ;;
-    7 ) echo -e "delete row"
+    6 ) display_row
     dive_into_table 
     ;;
-    8 ) exit
-  
+    7 ) delete_row
+    dive_into_table 
+    ;;
+    8 ) cd ../..
+    source ./scripts/dive-into-database.sh
+    dive_into_database 
     ;;
     * ) print_colored "red" "Invalid choice, Please Select a Correct Service Number."
     ;;

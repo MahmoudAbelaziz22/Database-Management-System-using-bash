@@ -528,3 +528,123 @@ function insert_data {
 	read
     fi
 }
+
+# Display Table
+function display_table {
+	# choose table
+	print_colored "bwhite" "Enter table's name:"
+	read table_name
+	##########
+	# not exist
+	if ! [[ -f "$table_name" ]]
+	then
+		print_colored "red" "this table doesn't exist."
+		display_table
+	else
+		## table exists
+		# display table's data
+		print_colored "green" "------------------------------------------------------------"
+		print_colored "green" "$(head -1 "$table_name" | awk 'BEGIN{ RS = ":"; FS = "-" } {print $1}' | awk 'BEGIN{ORS="\t"} {print $0}')"
+		print_colored "green" "------------------------------------------------------------"
+		print_colored "green" " $(sed '1d' "$table_name" | awk -F: 'BEGIN{OFS="\t"} {for(n = 1; n <= NF; n++) $n=$n}  1')"
+		print_colored "green" "------------------------------------------------------------"
+		print_colored "white" "press any key:"
+		read
+	fi
+}
+
+function display_row {
+	# choose table
+	print_colored "bwhite" "Enter table's name:"
+	read table_name
+	# not exist
+	if ! [[ -f "$table_name" ]]
+	then
+		print_colored "red" "this table doesn't exist."
+		display_row
+	else
+		## table exists
+		# enter pk
+		print_colored "bwhite" "Enter primary key \"$(head -1 "$table_name" | cut -d ':' -f1 |\
+		awk -F "-" 'BEGIN { RS = ":" } {print $1}')\" of type $(head -1 "$table_name"\
+		| cut -d ':' -f1 | awk -F "-" 'BEGIN { RS = ":" } {print $2}') and size $(head -1 "$table_name"\
+		| cut -d ':' -f1 | awk -F "-" 'BEGIN { RS = ":" } {print $3}') of the record "
+		read REPLY
+		
+		record_number=$(cut -d ':' -f1 "$table_name" | sed '1d'\
+		| grep -x -n -e "$REPLY" | cut -d':' -f1)
+		# null entry
+		if [[ "$REPLY" == '' ]]
+		then
+			print_colored "red" "No entry."
+		# record not exists
+		elif [[ "$record_number" = '' ]]
+		then
+			print_colored "red" "this primary key doesn't exist."
+		# record exists
+		else
+			let record_number=$record_number+1
+			number_of_column=$(head -1 "$table_name" | awk -F: '{print NF}') 
+			# to show the other values of record
+			print_colored "bwhite" "fields and values of this record:"
+			for (( i = 2; i <= number_of_column; i++ )); do
+					print_colored  "green" "\"$(head -1 $table_name | cut -d ':' -f$i | awk -F "-" 'BEGIN { RS = ":" } {print $1}')\" : $(sed -n "${record_number}p" "$table_name" | cut -d: -f$i)"
+			done
+		fi
+		print_colored "white" "press any key"
+		read
+	fi
+}
+
+# delete record (row)
+function delete_row {
+	# choose table
+	print_colored "bwhite" "Enter table's name:"
+	read table_name
+	# not exist
+	if ! [[ -f "$table_name" ]]
+	then
+		print_colored "red" "this table doesn't exist."
+		delete_row
+	else
+		# table exists
+		# enter pk
+		print_colored "bwhite" "\"Enter primary key \"$(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" 'BEGIN { RS = ":" } {print $1}')\" of type $(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" 'BEGIN { RS = ":" } {print $2}') and size $(head -1 "$table_name" | cut -d ':' -f1 | awk -F "-" 'BEGIN { RS = ":" } {print $3}')\" of the record to delete"
+		read REPLY
+		# get Number of this record
+		record_number=$(cut -d ':' -f1 "$table_name" | awk '{if(NR != 1) print $0}' | grep -x -n -e "$REPLY" | cut -d':' -f1)
+		# null entry
+		if [[ "$REPLY" == '' ]]
+		then
+			print_colored "red" "No entry."
+		# record not exists
+		elif [[ "$record_number" = '' ]]
+		then
+			print_colored "red" "this primary key doesn't exist."
+		# record exists
+		else
+		    clear
+            print_colored "green" "+------------------------------+"
+            print_colored "green" "|-------Are you sure?----------|"
+            print_colored "green" "|------------------------------|"
+            print_colored "green" "| 1. Yes.                      |"
+            print_colored "green" "| 2. No.                       |"
+            print_colored "green" "+------------------------------+"
+            print_colored "bwhite" "Are you sure, you want to delete $table_name table:"
+		    read REPLY
+            case $REPLY in
+              1 )
+			    let record_number=$record_number+1
+			    sed -i "${record_number}d" "$table_name"
+			    print_colored "green" "Record deleted successfully."
+			    ;;
+		      2 ) dive_into_table
+		        ;;
+		      * ) print_colored "red" "Invalid entry."
+		        ;;
+		    esac
+		fi
+		print_colored "white" "press any key"
+		read
+	fi
+}
